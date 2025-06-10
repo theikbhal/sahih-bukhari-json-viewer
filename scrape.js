@@ -101,4 +101,9 @@ async function scrapeAllHadiths(max = 1000) {
 }
 
 // scrapeAllHadiths(1000);
-scrapeAllHadiths(2000);
+// scrapeAllHadiths(2000);
+// scrapeAllHadiths(4000);
+// scrapeAllHadiths(5000);
+// scrapeAllHadiths(6000);
+// scrapeAllHadiths(7000);
+scrapeAllHadiths(7564);

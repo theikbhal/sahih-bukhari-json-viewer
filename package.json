@@ -6,19 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-images": "node generate_hadith_images.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.10",
+    "@mui/material": "^5.14.10",
+    "axios": "^1.5.0",
+    "cheerio": "^1.1.0",
+    "fs": "^0.0.1-security",
     "next": "^14.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@mui/material": "^5.14.10",
-    "@mui/icons-material": "^5.14.10",
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0"
+    "canvas": "^2.11.2",
+    "puppeteer-core": "^21.5.0"
   },
   "devDependencies": {
     "eslint": "^8.52.0",
