@@ -5,38 +5,47 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Path to the merged JSON file
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Path to the merged Hadith JSON file
 const ALL_HADITHS_FILE = path.join(__dirname, 'json', 'all_hadiths.json');
 
-let allHadiths = []; // Array to store all Hadiths globally
-let hadithsByBook = new Map(); // Map to store Hadiths grouped by book number
+let allHadiths = [];
+let hadithsByNumber = {}; // Map hadithGlobalNumber to Hadith object
+let hadithsByBook = {};   // Map bookNumber to an object of hadithsByNumberInBook
 
-// Function to load all Hadith data from the merged file
-function loadHadithData() {
-    console.log('Loading Hadith data from merged file...');
-    if (!fs.existsSync(ALL_HADITHS_FILE)) {
-        console.error(`Error: Merged Hadith file not found at ${ALL_HADITHS_FILE}. Please run merge_hadiths.js first.`);
-        return;
-    }
-
+async function loadHadithData() {
     try {
-        const data = JSON.parse(fs.readFileSync(ALL_HADITHS_FILE, 'utf8'));
-        allHadiths = data;
+        if (!fs.existsSync(ALL_HADITHS_FILE)) {
+            console.error(`Error: Merged Hadith file not found at ${ALL_HADITHS_FILE}`);
+            console.error("Please run 'node merge_hadiths.js' first.");
+            return;
+        }
 
-        // Re-populate hadithsByBook map for the second API endpoint
-        hadithsByBook = new Map(); // Clear previous data
+        const data = fs.readFileSync(ALL_HADITHS_FILE, 'utf8');
+        allHadiths = JSON.parse(data);
+        console.log(`Loaded ${allHadiths.length} Hadiths from ${ALL_HADITHS_FILE}`);
+
+        // Populate lookup maps
         allHadiths.forEach(hadith => {
-            if (hadith.bookNumber) {
-                if (!hadithsByBook.has(hadith.bookNumber)) {
-                    hadithsByBook.set(hadith.bookNumber, []);
+            if (hadith.globalId) {
+                hadithsByNumber[hadith.globalId] = hadith;
+            }
+
+            if (hadith.bookNumber && hadith.numberInBook) {
+                if (!hadithsByBook[hadith.bookNumber]) {
+                    hadithsByBook[hadith.bookNumber] = {};
                 }
-                hadithsByBook.get(hadith.bookNumber).push(hadith);
+                hadithsByBook[hadith.bookNumber][hadith.numberInBook] = hadith;
             }
         });
 
-        console.log(`Loaded ${allHadiths.length} Hadiths from ${ALL_HADITHS_FILE}`);
-    } catch (parseError) {
-        console.error(`Error parsing merged JSON file ${ALL_HADITHS_FILE}: ${parseError.message}`);
+        console.log(`Indexed ${Object.keys(hadithsByNumber).length} Hadiths by global number.`);
+        console.log(`Indexed ${Object.keys(hadithsByBook).length} Books.`);
+
+    } catch (error) {
+        console.error(`Failed to load or parse Hadith data: ${error.message}`);
     }
 }
 
@@ -54,55 +63,51 @@ app.use((req, res, next) => {
     next();
 });
 
-// API 1: Get Hadith by Global Hadith Number
+// API endpoint for /hadith/:hadithNumber
 app.get('/hadith/:hadithNumber', (req, res) => {
-    const requestedGlobalNumber = parseInt(req.params.hadithNumber);
-
-    if (isNaN(requestedGlobalNumber) || requestedGlobalNumber <= 0) {
-        return res.status(400).json({ error: 'Invalid Hadith number. Must be a positive integer.' });
+    const hadithNumber = parseInt(req.params.hadithNumber);
+    if (isNaN(hadithNumber)) {
+        return res.status(400).json({ error: 'Invalid Hadith number.' });
     }
 
-    // Find the Hadith using the globalId
-    const hadith = allHadiths.find(h => h.globalId === requestedGlobalNumber);
-
+    const hadith = hadithsByNumber[hadithNumber];
     if (hadith) {
         res.json(hadith);
     } else {
-        res.status(404).json({ error: `Hadith with global number ${requestedGlobalNumber} not found.` });
+        res.status(404).json({ error: `Hadith number ${hadithNumber} not found.` });
     }
 });
 
-// API 2: Get Hadith by Book Number and Hadith Number within that book
+// API endpoint for /book/:bookNumber/hadith/:hadithNumber
 app.get('/book/:bookNumber/hadith/:hadithNumber', (req, res) => {
-    const requestedBookNumber = parseInt(req.params.bookNumber);
-    const requestedNumberInBook = parseInt(req.params.hadithNumber);
+    const bookNumber = parseInt(req.params.bookNumber);
+    const hadithNumber = parseInt(req.params.hadithNumber);
 
-    if (isNaN(requestedBookNumber) || requestedBookNumber <= 0) {
-        return res.status(400).json({ error: 'Invalid book number. Must be a positive integer.' });
-    }
-    if (isNaN(requestedNumberInBook) || requestedNumberInBook <= 0) {
-        return res.status(400).json({ error: 'Invalid Hadith number. Must be a positive integer.' });
+    if (isNaN(bookNumber) || isNaN(hadithNumber)) {
+        return res.status(400).json({ error: 'Invalid book or Hadith number.' });
     }
 
-    const bookHadiths = hadithsByBook.get(requestedBookNumber);
-
-    if (!bookHadiths) {
-        return res.status(404).json({ error: `Book ${requestedBookNumber} not found.` });
-    }
-
-    // Find the Hadith within this specific book's array by its original 'numberInBook' property
-    const hadith = bookHadiths.find(h => h.numberInBook === requestedNumberInBook);
-
-    if (hadith) {
-        res.json(hadith);
+    const bookHadiths = hadithsByBook[bookNumber];
+    if (bookHadiths) {
+        const hadith = bookHadiths[hadithNumber];
+        if (hadith) {
+            res.json(hadith);
+        } else {
+            res.status(404).json({ error: `Hadith number ${hadithNumber} not found in Book ${bookNumber}.` });
+        }
     } else {
-        res.status(404).json({ error: `Hadith number ${requestedNumberInBook} not found in Book ${requestedBookNumber}.` });
+        res.status(404).json({ error: `Book ${bookNumber} not found.` });
     }
+});
+
+// Root route to serve the homepage
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`Hadith API is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
     console.log('Try:');
     console.log(`  http://localhost:${PORT}/hadith/1`);
     console.log(`  http://localhost:${PORT}/book/1/hadith/1`);

@@ -72,3 +72,37 @@ Method: GET
 URL: http://your-domain/api/books/{bookId}
 Headers:
 Apply to scrape.js
+---
+
+vercel deployed 
+even home page 
+boook/x/haidth/y not woring api its ok
+--
+focus on image create for yt short image from text hadith 1 egnlisht text
+---
+
+C:\workspace\scrape_space\albukari\images\converted_2.jpg
+
+use this background 
+---
+generaete image, vvide, adjust video length 20 second 
+---
+lets crate video meta
+title, description, local path, php path , channel url 
+description -full hadith , 
+title - simple first few words ofr hadith, book number, hadit number, gloabl 
+local path - local compute rpath
+php path - upload computer path 
+
+---
+update in db via code
+
+json file 
+n8n pick it upload 
+__
+try ro 10 only 
+--
+C:\workspace\scrape_space\albukari\process_hadith_upload.js
+not working fix it
+---
+why process hadith upload script stuck with ffpmeg command

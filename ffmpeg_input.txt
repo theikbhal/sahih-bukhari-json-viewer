@@ -1,0 +1,2 @@
+file 'C:\workspace\scrape_space\albukari\temp_yt_shorts_images\hadith_1.png'
+duration 20
