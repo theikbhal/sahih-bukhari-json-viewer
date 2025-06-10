@@ -54,3 +54,21 @@ sahih-bukhari-json-viewer
 ---
 https://github.com/theikbhal/sahih-bukhari-json-viewer
 ---
+extpress, react -> tried, but back to next.js only 
+
+use next.js only
+
+===
+
+o use these APIs in n8n:
+In n8n, create a new HTTP Request node
+Configure it as follows:
+Method: GET
+URL: http://your-domain/api/books (for list of books)
+Headers:
+Apply to scrape.js
+For getting specific book hadiths:
+Method: GET
+URL: http://your-domain/api/books/{bookId}
+Headers:
+Apply to scrape.js

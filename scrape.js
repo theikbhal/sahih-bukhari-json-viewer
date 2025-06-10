@@ -100,4 +100,5 @@ async function scrapeAllHadiths(max = 1000) {
   console.log('✅ Done scraping all hadiths.');
 }
 
-scrapeAllHadiths(1000);
+// scrapeAllHadiths(1000);
+scrapeAllHadiths(2000);
