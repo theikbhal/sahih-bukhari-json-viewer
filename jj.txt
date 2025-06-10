@@ -1,0 +1,56 @@
+https://chatgpt.com/c/6847caf1-c644-800b-9e72-15b09673ae97
+---
+async function runAllBooks() {
+  for (let i = 1; i <= 97; i++) {
+    try {
+      await scrapeHadiths(i);
+    } catch (err) {
+      console.error(`❌ Error scraping book ${i}:`, err.message);
+    }
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Delay to avoid rate-limiting
+  }
+}
+
+runAllBooks();
+
+---
+| Book Number | Topic                    | Number of Pages |
+| ----------- | ------------------------ | --------------- |
+| **3**       | Knowledge                | \~2 pages       |
+| **8**       | Prayer (Salat)           | \~10+ pages     |
+| **23**      | Funerals                 | \~6 pages       |
+| **34**      | Sales and Trade          | \~10+ pages     |
+| **52**      | Fighting for the Cause   | \~10+ pages     |
+| **76**      | Medicine                 | \~8–9 pages     |
+| **87**      | Interpretation of Dreams | \~3 pages       |
+
+---
+test pagination
+
+---
+add book number, 
+add hadithnumber in the json
+
+===
+https://sunnah.com/bukhari:53
+===
+https://sunnah.com/bukhari/23/129
+===
+this is enough
+
+https://sunnah.com/bukhari:8
+change number
+we will get english, arabic, hadith number in the book, book number  , narrator
+---
+1000 calls need to me made 
+give space of 0.1 second druation
+
+---
+
+Sahih al-Bukhari
+---
+create github repo
+sahih-bukhari-json-viewer
+---
+https://github.com/theikbhal/sahih-bukhari-json-viewer
+---
